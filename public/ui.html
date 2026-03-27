@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>心石助手</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Markdown Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#556959",
+            primaryContainer: "#d1e8d3",
+            secondary: "#6c6451",
+            secondaryContainer: "#ede1ca",
+            tertiary: "#7b6100",
+            tertiaryContainer: "#f5ce53",
+            surface: "#fffcf7",
+            surfaceContainer: "#f6f3ec",
+            surfaceContainerLow: "#fcf9f3",
+            surfaceContainerHigh: "#f0eee6",
+            surfaceVariant: "#eae8e0",
+            onSurface: "#383833",
+            onSurfaceVariant: "#65655e",
+            outline: "#81817a",
+            outlineVariant: "#bbb9b2",
+          },
+          fontFamily: {
+            serif: ["Noto Serif SC", "serif"],
+            body: ["Manrope", "sans-serif"],
+          }
+        }
+      }
+    }
+
+    // Markdown 配置
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+    });
+  </script>
+
+  <style>
+    body {
+      font-family: 'Manrope', sans-serif;
+      background-color: #fffcf7;
+      color: #383833;
+    }
+    .font-serif { font-family: 'Noto Serif SC', serif; }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    /* Markdown 样式 */
+    .markdown-content { line-height: 1.7; }
+    .markdown-content strong {
+      font-weight: 600;
+      color: #556959;
+    }
+    .markdown-content em {
+      font-style: italic;
+      color: #6c6451;
+    }
+    .markdown-content ul, .markdown-content ol {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .markdown-content li { margin: 4px 0; }
+    .markdown-content blockquote {
+      margin: 12px 0;
+      padding: 8px 16px;
+      background: #f6f3ec;
+      border-left: 3px solid #7b6100;
+      border-radius: 8px;
+      font-style: italic;
+      color: #6c6451;
+    }
+
+    /* 页面切换动画 */
+    .page {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .page.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* 养护卡片动画 */
+    .care-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .care-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(85,105,89,0.12);
+    }
+
+    /* 建议按钮样式 */
+    .suggestion-btn {
+      transition: all 0.2s ease;
+    }
+    .suggestion-btn:hover {
+      background: #f6f3ec;
+      border-color: #556959;
+    }
+
+    /* 高亮短语 */
+    .highlight-phrase {
+      background: linear-gradient(120deg, #f5ce5333 0%, #f5ce5333 100%);
+      padding: 2px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .highlight-phrase:hover {
+      background: #f5ce5366;
+    }
+
+    /* 加载动画 */
+    .typing-indicator {
+      display: inline-flex;
+      gap: 4px;
+    }
+    .typing-indicator span {
+      width: 6px;
+      height: 6px;
+      background: #556959;
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+      30% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+
+<body class="antialiased min-h-screen">
+
+  <!-- ========== 首页 ========== -->
+  <div id="page-home" class="page active">
+    <!-- Header -->
+    <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 w-full">
+      <div class="flex justify-between items-center w-full px-6 py-5 max-w-3xl mx-auto">
+        <h1 class="font-serif tracking-tight text-xl font-semibold text-primary">心石助手</h1>
+        <div class="flex items-center gap-6">
+          <nav class="hidden md:flex gap-6 text-sm">
+            <a class="text-primary font-semibold" onclick="navigateTo('home')">首页</a>
+            <a class="text-onSurfaceVariant hover:text-primary transition-colors" onclick="navigateTo('chat')">对话</a>
+            <a class="text-onSurfaceVariant hover:text-primary transition-colors" onclick="navigateTo('plan')">计划</a>
+            <a class="text-onSurfaceVariant hover:text-primary transition-colors" onclick="navigateTo('journey')">旅程</a>
+          </nav>
+          <button class="material-symbols-outlined text-primary text-2xl">account_circle</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="py-10 px-6 max-w-3xl mx-auto space-y-16">
+      <!-- 问候语 -->
+      <section id="greeting-section" class="space-y-3 text-center py-6">
+        <p class="text-onSurfaceVariant font-medium tracking-widest uppercase text-xs" id="greeting-time">今日清晨</p>
+        <h2 class="font-serif text-2xl md:text-3xl text-onSurface leading-snug" id="greeting-text">
+          早安，搬走的那几块「心石」都没有再回来。
+        </h2>
+      </section>
+
+      <!-- 测评入口 -->
+      <section id="assess-entry">
+        <button onclick="navigateTo('assess')" class="w-full group bg-surfaceContainerLow rounded-2xl p-8 md:p-10 text-center transition-all hover:shadow-lg border border-surfaceVariant/50">
+          <div class="flex flex-col items-center gap-6">
+            <div class="space-y-3">
+              <span class="inline-flex items-center gap-2 text-tertiary font-bold tracking-widest text-xs uppercase">
+                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                心石测评
+              </span>
+              <h3 class="font-serif text-xl md:text-2xl text-onSurface">1分钟测一测，你心里有几块石头？</h3>
+              <p class="text-onSurfaceVariant max-w-md mx-auto">通过简单的对话，觉察那些无形中消耗你的压力。</p>
+            </div>
+            <div class="bg-primary text-white px-8 py-3 rounded-full flex items-center gap-2 transition-transform group-hover:scale-105">
+              <span class="font-semibold tracking-wide">开始测评</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+        </button>
+      </section>
+
+      <!-- 今日减法（养护计划动态渲染区域） -->
+      <section id="care-plan-section" class="space-y-6 pb-10">
+        <div class="flex flex-col items-center gap-2">
+          <h3 class="font-serif text-xl text-onSurface">今日减法</h3>
+          <div class="w-6 h-[1px] bg-outlineVariant"></div>
+        </div>
+
+        <!-- 养护计划容器（动态渲染） -->
+        <div id="care-tasks-container" class="space-y-3">
+          <!-- 默认静态内容（AI未生成时显示） -->
+          <div class="care-card group flex items-center gap-5 p-5 rounded-xl bg-surfaceContainerLow border border-transparent hover:border-surfaceVariant transition-all cursor-pointer">
+            <div class="w-11 h-11 rounded-full bg-surfaceContainerHigh flex items-center justify-center text-primary">
+              <span class="material-symbols-outlined">air</span>
+            </div>
+            <div class="flex-1">
+              <h5 class="font-serif text-lg text-onSurface">深呼吸一分钟</h5>
+              <p class="text-sm text-onSurfaceVariant">感受空气在胸腔的起伏，不去想任何事。</p>
+            </div>
+            <span class="material-symbols-outlined text-outlineVariant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+          </div>
+          <div class="care-card group flex items-center gap-5 p-5 rounded-xl bg-surfaceContainerLow border border-transparent hover:border-surfaceVariant transition-all cursor-pointer">
+            <div class="w-11 h-11 rounded-full bg-surfaceContainerHigh flex items-center justify-center text-secondary">
+              <span class="material-symbols-outlined">phonelink_off</span>
+            </div>
+            <div class="flex-1">
+              <h5 class="font-serif text-lg text-onSurface">睡前10分钟关闭手机</h5>
+              <p class="text-sm text-onSurfaceVariant">将喧嚣隔绝在卧室之外，为心灵降温。</p>
+            </div>
+            <span class="material-symbols-outlined text-outlineVariant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+          </div>
+        </div>
+
+        <!-- 进度提示（动态渲染） -->
+        <div id="care-progress" class="text-center pt-4">
+          <p class="font-serif text-sm text-secondary italic">"搬一块，少一块，慢慢来"</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- 底部导航（移动端） -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/95 backdrop-blur-md rounded-t-2xl border-t border-surfaceVariant/30">
+      <a class="flex flex-col items-center text-primary px-4 py-2" onclick="navigateTo('home')">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+        <span class="text-[10px] font-medium mt-1">首页</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('chat')">
+        <span class="material-symbols-outlined">chat_bubble</span>
+        <span class="text-[10px] font-medium mt-1">对话</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('plan')">
+        <span class="material-symbols-outlined">event_note</span>
+        <span class="text-[10px] font-medium mt-1">计划</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('journey')">
+        <span class="material-symbols-outlined">auto_stories</span>
+        <span class="text-[10px] font-medium mt-1">旅程</span>
+      </a>
+    </nav>
+
+    <!-- FAB -->
+    <button onclick="navigateTo('chat')" class="fixed bottom-20 right-5 md:bottom-10 md:right-10 w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40">
+      <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">chat</span>
+    </button>
+  </div>
+
+  <!-- ========== 测评页面 ========== -->
+  <div id="page-assess" class="page">
+    <header class="w-full px-6 py-5 max-w-3xl mx-auto flex justify-between items-center">
+      <button onclick="navigateTo('home')" class="flex items-center gap-2 text-onSurfaceVariant hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-sm">arrow_back</span>
+        <span class="text-sm font-medium">返回</span>
+      </button>
+      <div class="text-sm text-onSurfaceVariant" id="assess-progress">1 / 10</div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center px-6 max-w-2xl mx-auto py-10">
+      <div class="w-full text-center space-y-10">
+        <!-- 题目 -->
+        <h1 id="assess-question" class="text-xl md:text-2xl font-serif font-semibold leading-snug text-onSurface">
+          你是否经常把「烦死了」「累死了」「气死了」这类负面词挂在嘴边？
+        </h1>
+
+        <!-- 选项 -->
+        <div id="assess-options" class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <!-- 动态渲染 -->
+        </div>
+
+        <!-- 进度条 -->
+        <div class="w-full max-w-md mx-auto">
+          <div class="h-1 bg-surfaceVariant rounded-full overflow-hidden">
+            <div id="assess-progress-bar" class="h-full bg-primary transition-all duration-300" style="width: 10%"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== 测评结果页面 ========== -->
+  <div id="page-assess-result" class="page">
+    <header class="w-full px-6 py-5 max-w-3xl mx-auto flex justify-between items-center">
+      <div class="font-serif text-xl text-primary">测评结果</div>
+    </header>
+
+    <main class="px-6 max-w-2xl mx-auto py-10 space-y-8">
+      <!-- 内耗类型 -->
+      <div class="bg-primaryContainer/30 rounded-2xl p-6 text-center">
+        <p class="text-sm text-onSurfaceVariant mb-2">你的内耗类型</p>
+        <h2 id="result-type" class="font-serif text-2xl text-primary font-semibold">焦虑纠结型</h2>
+      </div>
+
+      <!-- 诊断报告 -->
+      <div class="bg-surfaceContainerLow rounded-2xl p-6 space-y-4">
+        <h3 class="font-serif text-lg text-onSurface">你的心石头</h3>
+        <div id="result-report" class="markdown-content text-onSurfaceVariant">
+          <!-- Markdown渲染 -->
+        </div>
+      </div>
+
+      <!-- 养护计划预览 -->
+      <div class="bg-surfaceContainerLow rounded-2xl p-6 space-y-4">
+        <h3 class="font-serif text-lg text-onSurface">今日建议</h3>
+        <div id="result-care-preview" class="space-y-3">
+          <!-- 动态渲染养护卡片 -->
+        </div>
+      </div>
+
+      <!-- 进入对话按钮 -->
+      <button onclick="navigateTo('chat')" class="w-full bg-primary text-white py-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+        <span>开始清理心石头</span>
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </main>
+  </div>
+
+  <!-- ========== 养护计划页面 ========== -->
+  <div id="page-plan" class="page">
+    <!-- Header -->
+    <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 w-full">
+      <div class="flex justify-between items-center w-full px-6 py-5 max-w-3xl mx-auto">
+        <h1 class="font-serif text-xl text-primary">每日心气养护</h1>
+        <div class="flex items-center gap-4">
+          <button onclick="navigateTo('home')" class="material-symbols-outlined text-primary text-2xl">home</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="px-6 max-w-3xl mx-auto py-10 space-y-10">
+      <!-- 今日格言 -->
+      <section class="text-center space-y-4">
+        <p class="text-sm text-onSurfaceVariant tracking-widest uppercase">今日格言</p>
+        <blockquote class="font-serif text-xl md:text-2xl text-onSurface leading-relaxed italic">
+          "生活中那些细碎的压力，就像路边的顽石。不需要一次性搬走，每日挪动一寸，心气自会舒展。"
+        </blockquote>
+        <p class="text-sm text-secondary">—— 张海敏博士</p>
+      </section>
+
+      <!-- 养护卡片网格 -->
+      <section class="space-y-6">
+        <h2 class="font-serif text-lg text-onSurface">今日养护</h2>
+        <div id="plan-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 动态渲染养护卡片 -->
+        </div>
+      </section>
+
+      <!-- 进度条 -->
+      <section class="text-center space-y-4 py-6">
+        <p class="text-sm text-onSurfaceVariant tracking-widest">今日养护进度</p>
+        <div class="w-full max-w-md mx-auto h-2 bg-surfaceVariant rounded-full overflow-hidden">
+          <div id="plan-progress-bar" class="h-full bg-tertiary transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <p id="plan-progress-message" class="font-serif text-secondary italic">"搬一块，少一块，慢慢来"</p>
+      </section>
+
+      <!-- AI说明 -->
+      <section class="bg-surfaceContainerLow rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary">auto_awesome</span>
+          <h3 class="font-serif text-onSurface">为什么推荐这些？</h3>
+        </div>
+        <p id="plan-ai-reason" class="text-onSurfaceVariant text-sm leading-relaxed">
+          根据你的内耗类型和最近的对话，这些是最适合今天的养护任务。每个任务不超过5分钟，符合"减法养生"的理念。
+        </p>
+      </section>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/95 backdrop-blur-md rounded-t-2xl">
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('home')">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-medium mt-1">首页</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('chat')">
+        <span class="material-symbols-outlined">chat_bubble</span>
+        <span class="text-[10px] font-medium mt-1">对话</span>
+      </a>
+      <a class="flex flex-col items-center text-primary px-4 py-2">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
+        <span class="text-[10px] font-semibold mt-1">计划</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ========== 对话页面 ========== -->
+  <div id="page-chat" class="page">
+    <!-- Header -->
+    <header class="bg-surface/80 backdrop-blur-md fixed top-0 w-full z-50">
+      <div class="flex justify-between items-center w-full px-6 py-4 max-w-3xl mx-auto">
+        <h1 class="font-serif text-xl text-primary">心石清理师</h1>
+        <div class="flex items-center gap-4">
+          <button onclick="navigateTo('home')" class="material-symbols-outlined text-primary hover:opacity-70">home</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 对话区域 -->
+    <main class="pt-20 pb-44 px-4 max-w-2xl mx-auto">
+      <!-- 引用语 -->
+      <section class="text-center px-4 mb-8">
+        <p class="font-serif text-base italic text-secondary leading-relaxed opacity-80">
+          「把心里的石头一块块搬开，气血就会顺畅。」
+        </p>
+        <p class="mt-1 text-xs text-outline">— 张海敏博士</p>
+      </section>
+
+      <!-- 消息列表（动态渲染） -->
+      <div id="chat-messages" class="flex flex-col gap-6">
+        <!-- AI初始消息 -->
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-white text-lg">psychology</span>
+          </div>
+          <div class="bg-surfaceContainerLow p-5 rounded-xl max-w-[90%] border border-surfaceVariant/30">
+            <div id="chat-initial-message" class="markdown-content text-onSurface">
+              <p>你好，我是你的<strong>心石清理师</strong>。</p>
+              <p>跟我说说今天有什么让你纠结的事，我帮你一块一块搬开。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI建议按钮（动态渲染） -->
+      <div id="chat-suggestions" class="mt-4 flex flex-wrap gap-2">
+        <button class="suggestion-btn px-4 py-2 rounded-full border border-outlineVariant/50 text-sm text-onSurfaceVariant hover:border-primary" onclick="fillInput('说说今天最让我纠结的事')">
+          说说今天最让我纠结的事
+        </button>
+        <button class="suggestion-btn px-4 py-2 rounded-full border border-outlineVariant/50 text-sm text-onSurfaceVariant hover:border-primary" onclick="fillInput('我总是担心别人的看法')">
+          我总是担心别人的看法
+        </button>
+        <button class="suggestion-btn px-4 py-2 rounded-full border border-outlineVariant/50 text-sm text-onSurfaceVariant hover:border-primary" onclick="fillInput('聊聊我的测评结果')">
+          聊聊我的测评结果
+        </button>
+      </div>
+    </main>
+
+    <!-- 输入区域 -->
+    <div class="fixed bottom-0 left-0 w-full px-4 pb-20 md:pb-6 pt-3 bg-surface/95 backdrop-blur-md z-40">
+      <!-- 生成养护计划按钮 -->
+      <div class="max-w-2xl mx-auto mb-2">
+        <button id="chat-plan-btn" onclick="generateCarePlanFromChat()" class="w-full bg-primaryContainer/50 hover:bg-primaryContainer border border-primaryContainer/50 rounded-full py-2.5 px-4 flex items-center justify-center gap-2 transition-all">
+          <span class="material-symbols-outlined text-primary text-base">auto_awesome</span>
+          <span class="text-primary font-semibold text-sm">生成养护计划</span>
+          <span class="material-symbols-outlined text-primary text-base">arrow_forward</span>
+        </button>
+      </div>
+      <!-- 输入框 -->
+      <div class="max-w-2xl mx-auto flex items-center gap-2 bg-surfaceContainerLowest p-2 rounded-full border border-surfaceVariant">
+        <button class="w-9 h-9 text-onSurfaceVariant hover:bg-surfaceContainer rounded-full flex items-center justify-center">
+          <span class="material-symbols-outlined">add</span>
+        </button>
+        <input id="chat-input" type="text" class="flex-grow bg-transparent border-none focus:ring-0 text-sm px-2 placeholder:text-outlineVariant" placeholder="输入你想清理的情绪..." onkeypress="handleInputKeypress(event)"/>
+        <button onclick="sendMessage()" class="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center active:scale-90 transition-transform">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/95 backdrop-blur-md rounded-t-2xl">
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('home')">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-medium mt-1">首页</span>
+      </a>
+      <a class="flex flex-col items-center text-primary px-4 py-2">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+        <span class="text-[10px] font-semibold mt-1">对话</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('plan')">
+        <span class="material-symbols-outlined">event_note</span>
+        <span class="text-[10px] font-medium mt-1">计划</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('journey')">
+        <span class="material-symbols-outlined">auto_stories</span>
+        <span class="text-[10px] font-medium mt-1">旅程</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ========== 旅程页面 ========== -->
+  <div id="page-journey" class="page">
+    <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 w-full">
+      <div class="flex justify-between items-center w-full px-6 py-5 max-w-3xl mx-auto">
+        <h1 class="font-serif text-xl text-primary">我的旅程</h1>
+        <button onclick="navigateTo('home')" class="material-symbols-outlined text-primary text-2xl">home</button>
+      </div>
+    </header>
+
+    <main class="px-6 max-w-2xl mx-auto py-10 space-y-8">
+      <!-- 统计 -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-surfaceContainerLow rounded-xl p-5 text-center">
+          <p class="text-3xl font-serif text-primary font-semibold" id="journey-stones">5</p>
+          <p class="text-sm text-onSurfaceVariant mt-1">块心石已清理</p>
+        </div>
+        <div class="bg-surfaceContainerLow rounded-xl p-5 text-center">
+          <p class="text-3xl font-serif text-tertiary font-semibold" id="journey-days">7</p>
+          <p class="text-sm text-onSurfaceVariant mt-1">天连续记录</p>
+        </div>
+      </div>
+
+      <!-- 时间线 -->
+      <div class="space-y-4">
+        <h3 class="font-serif text-lg text-onSurface">清理记录</h3>
+        <div id="journey-timeline" class="space-y-3">
+          <!-- 动态渲染 -->
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-primaryContainer flex items-center justify-center text-primary text-xs font-semibold">D1</div>
+            <div class="flex-1 bg-surfaceContainerLow rounded-xl p-4">
+              <p class="text-sm text-onSurface">「领导批评我，纠结了一下午」</p>
+              <p class="text-xs text-onSurfaceVariant mt-2">已清理 ✓</p>
+            </div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-8 h-8 rounded-full bg-secondaryContainer flex items-center justify-center text-secondary text-xs font-semibold">D3</div>
+            <div class="flex-1 bg-surfaceContainerLow rounded-xl p-4">
+              <p class="text-sm text-onSurface">「同事吐槽让我累死了」</p>
+              <p class="text-xs text-onSurfaceVariant mt-2">已清理 ✓</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/95 backdrop-blur-md rounded-t-2xl">
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('home')">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] font-medium mt-1">首页</span>
+      </a>
+      <a class="flex flex-col items-center text-onSurfaceVariant px-4 py-2" onclick="navigateTo('chat')">
+        <span class="material-symbols-outlined">chat_bubble</span>
+        <span class="text-[10px] font-medium mt-1">对话</span>
+      </a>
+      <a class="flex flex-col items-center text-primary px-4 py-2">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+        <span class="text-[10px] font-semibold mt-1">旅程</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ========== JavaScript ========== -->
+  <script>
+    // ====== API配置 ======
+    const API_BASE = window.location.origin;
+
+    // ====== 状态管理 ======
+    const AppState = {
+      currentPage: 'home',
+      userId: 'demo-user',
+      exhaustType: null,
+      assessAnswers: [],
+      currentQuestionIndex: 0,
+      conversations: [],
+      carePlan: null
+    };
+
+    // ====== 养护计划模板 ======
+    const CARE_TEMPLATES = {
+      morning_breath: {
+        icon: 'wb_sunny',
+        title: '晨曦观息',
+        colorClass: 'tertiary',
+        template: '{duration}分钟{action}。{rationale}',
+        defaults: { duration: '5', action: '呼吸引导', rationale: '在清晨找回呼吸的节奏' }
+      },
+      mindful_afternoon: {
+        icon: 'energy_savings_leaf',
+        title: '正念午后',
+        colorClass: 'primary',
+        template: '{action}。{rationale}',
+        defaults: { action: '放下手机，感受指尖的温度', rationale: '在纷扰的午后为心灵留白' }
+      },
+      prune_relation: {
+        icon: 'content_cut',
+        title: '修剪关系',
+        colorClass: 'secondary',
+        template: '{action}。{rationale}',
+        defaults: { action: '主动推掉一个无效社交', rationale: '给自己的时间表做个减法' }
+      },
+      night_review: {
+        icon: 'bedtime',
+        title: '深夜复盘',
+        colorClass: 'neutral',
+        template: '{action}。{rationale}',
+        defaults: { action: '写下今天搬开的三块石头', rationale: '让负累留在今天，轻装入眠' }
+      },
+      language_watch: {
+        icon: 'record_voice_over',
+        title: '语言觉察',
+        colorClass: 'primary',
+        template: '觉察{count}次负面表达，替换成「{replacement}」。{rationale}',
+        defaults: { count: '3', replacement: '这件事有点棘手', rationale: '语言暗示会直接影响身体状态' }
+      },
+      five_reduce: {
+        icon: 'self_improvement',
+        title: '五减默念',
+        colorClass: 'tertiary',
+        template: '花{duration}分钟默念：减去过度欲求、减去无谓焦虑、减去抱怨、减去对过去的纠结。{rationale}',
+        defaults: { duration: '1', rationale: '把心里的石头一块块搬出来' }
+      }
+    };
+
+    // ====== 测评题目 ======
+    const ASSESS_QUESTIONS = [
+      { q: '你是否经常把「烦死了」「累死了」「气死了」这类负面词挂在嘴边？', opts: ['一天好几次', '偶尔说', '几乎不说'] },
+      { q: '你每天能留出1小时完全不碰手机、不处理工作信息的无干扰时间吗？', opts: ['完全不行', '偶尔能', '每天都有'] },
+      { q: '你身边有没有那种「见面聊完天，你感觉比干一天活还累」的人？', opts: ['有好几个', '有一两个', '几乎没有'] },
+      { q: '你会不会反复纠结过去发生的糟心事，或总忍不住提前为还没发生的事焦虑？', opts: ['经常这样', '偶尔会', '很少'] },
+      { q: '你最近一个月，能轻松睡到自然醒，第二天起来感觉精力充足吗？', opts: ['很难', '偶尔可以', '基本都能'] },
+      { q: '你会不会因为别人一句负面评价，心里不舒服好几天？', opts: ['会', '偶尔会', '不会'] },
+      { q: '你每天的休闲时间，大部分都用来刷短视频/碎片化社交吗？', opts: ['是的', '一半一半', '经常读深度内容'] },
+      { q: '你是不是总觉得"我还不够"，想要赚更多钱、买更好的东西？', opts: ['是的', '偶尔会焦虑', '不会'] },
+      { q: '你会不会经常和别人吐槽工作、生活里的不顺，挂在嘴边说个没完？', opts: ['每天都要', '偶尔吐槽', '很少抱怨'] },
+      { q: '你最近一个月，有没有过「投入一件事，完全忘记时间」的心流体验？', opts: ['从来没有', '偶尔有', '经常有'] }
+    ];
+
+    // ====== 内耗类型判定 ======
+    function determineExhaustType(answers) {
+      // answers: ['A', 'B', 'A', ...] 对应10题
+      const types = [];
+
+      if (answers[0] === 'A') types.push('语言暗示型');
+      if (answers[2] === 'A') types.push('社交消耗型');
+      if (answers[3] === 'A' || answers[5] === 'A') types.push('焦虑纠结型');
+      if (answers[1] === 'A' && answers[4] === 'A') types.push('高压心疲型');
+      if (answers[7] === 'A' && answers[8] === 'A') types.push('过度欲求型');
+      if (answers[6] === 'A' && answers[9] === 'A') types.push('认知耗竭型');
+
+      return types.length > 1 ? '复合型（' + types.join('、') + '）' : (types[0] || '焦虑纠结型');
+    }
+
+    // ====== 生成测评报告 ======
+    function generateReport(exhaustType) {
+      const reports = {
+        '语言暗示型': '你已习惯把负面表达挂在嘴边，这些话会不断给大脑做负面暗示，让身体慢慢配合产生疲惫感。\n\n**建议**：接下来3天，每次想说「烦死了/累死了」的时候，先停下来，换成中性表达。',
+        '社交消耗型': '你身边存在长期消耗你的人，和他们相处完你比干一天活还累，这些人就像「生命里的慢性毒药」。\n\n**建议**：本周就推掉1个你本来就不想去的无效社交，不用不好意思。',
+        '焦虑纠结型': '你总把过去的糟心事放在心里，或者忍不住提前为还没发生的事焦虑，这些情绪一直堆在心里，就变成了压住你的石头。\n\n**建议**：今天就做一次「物理清理」——把让你纠结的事写在纸上，然后揉碎扔进垃圾桶。',
+        '高压心疲型': '你长期被信息轰炸，没有属于自己的放空时间，加上睡不好，压力激素一直居高不下，身体得不到修复。\n\n**建议**：从今天开始，每天挤出15分钟无干扰独处。',
+        '过度欲求型': '你一直停不下来追求更多，总觉得「我还不够」，这种过度欲求就是你心里最大的石头。\n\n**建议**：本周做一次「欲望清理」——写下3个你最近强行想要的东西，划掉至少1个不是必需的。',
+        '认知耗竭型': '你长期被碎片化短视频消耗，大脑一直停留在低信息密度的刺激里，认知慢慢失去弹性。\n\n**建议**：从今天开始，每天抽15分钟读一页「费脑子」的书。'
+      };
+
+      return reports[exhaustType.split('（')[0]] || reports['焦虑纠结型'];
+    }
+
+    // ====== 页面导航 ======
+    function navigateTo(page) {
+      // 隐藏所有页面
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      // 显示目标页面
+      document.getElementById('page-' + page).classList.add('active');
+      AppState.currentPage = page;
+
+      // 页面初始化
+      if (page === 'assess') initAssessPage();
+      if (page === 'chat') initChatPage();
+      if (page === 'plan') initPlanPage();
+    }
+
+    // ====== 养护计划页面 ======
+    function initPlanPage() {
+      // 从后端获取AI生成的养护计划
+      fetch(`${API_BASE}/care-plan?userId=${AppState.userId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.carePlan) {
+            AppState.carePlan = data.carePlan;
+          }
+          renderPlanPage();
+        })
+        .catch(err => {
+          console.error('获取养护计划失败:', err);
+          renderPlanPage();
+        });
+    }
+
+    function renderPlanPage() {
+      const container = document.getElementById('plan-cards-grid');
+
+      if (!AppState.carePlan || !AppState.carePlan.tasks || AppState.carePlan.tasks.length === 0) {
+        // 还没有养护计划，显示引导
+        container.innerHTML = `
+          <div class="col-span-full text-center py-16 space-y-6">
+            <span class="material-symbols-outlined text-6xl text-outlineVariant">auto_awesome</span>
+            <div>
+              <h3 class="font-serif text-xl text-onSurface mb-2">还没有养护计划</h3>
+              <p class="text-onSurfaceVariant">完成测评后，AI会根据你的内耗类型生成个性化养护计划</p>
+            </div>
+            <button onclick="navigateTo('assess')" class="bg-primary text-white px-8 py-3 rounded-full font-semibold">
+              开始测评
+            </button>
+          </div>
+        `;
+        document.getElementById('plan-progress-bar').style.width = '0%';
+        document.getElementById('plan-progress-message').textContent = '"先测一测，再定计划"';
+        return;
+      }
+
+      // 渲染AI生成的养护卡片
+      container.innerHTML = AppState.carePlan.tasks.map((task, index) => {
+        const template = CARE_TEMPLATES[task.templateId];
+        if (!template) return '';
+
+        const content = { ...template.defaults, ...task.customContent };
+        const description = template.template.replace(/\{(\w+)\}/g, (_, k) => content[k] || '');
+
+        const colorMap = {
+          tertiary: 'bg-tertiaryContainer/20 text-tertiary',
+          primary: 'bg-primaryContainer/20 text-primary',
+          secondary: 'bg-secondaryContainer/30 text-secondary',
+          neutral: 'bg-onSurface/5 text-onSurface'
+        };
+
+        const isCompleted = task.completed;
+        const steps = content.steps || [];
+        const example = content.example || '';
+
+        // 构建步骤HTML
+        const stepsHtml = steps.length > 0 ? `
+          <div class="mt-4 space-y-2">
+            ${steps.map((step, i) => `
+              <div class="flex items-start gap-2 text-sm text-onSurfaceVariant">
+                <span class="w-5 h-5 rounded-full bg-primaryContainer/50 flex items-center justify-center text-xs text-primary flex-shrink-0">${i + 1}</span>
+                <span>${step}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : '';
+
+        // 构建示例HTML
+        const exampleHtml = example ? `
+          <div class="mt-4 bg-surfaceContainer p-4 rounded-lg text-sm text-onSurfaceVariant italic">
+            <p class="text-xs text-onSurfaceVariant/60 mb-2">💬 参考话术</p>
+            <p class="whitespace-pre-line">${example}</p>
+          </div>
+        ` : '';
+
+        return `
+          <div class="care-card bg-surfaceContainerLowest rounded-xl p-6 transition-all duration-300 cursor-pointer ${isCompleted ? 'opacity-60' : 'hover:translate-y-[-4px]'}" onclick="toggleTaskComplete(${index})">
+            <div class="flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full ${colorMap[template.colorClass]} flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-2xl">${template.icon}</span>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-serif text-lg text-onSurface mb-1">${template.title}</h3>
+                <p class="text-sm text-onSurfaceVariant leading-relaxed">${description}</p>
+                ${stepsHtml}
+                ${exampleHtml}
+              </div>
+            </div>
+            <div class="mt-4 flex items-center ${isCompleted ? 'text-primary' : 'text-primary'} font-semibold text-sm">
+              <span>${isCompleted ? '已完成 ✓' : '开始练习'}</span>
+              ${!isCompleted ? '<span class="material-symbols-outlined ml-1 text-base">arrow_forward</span>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 更新进度条
+      const completedCount = AppState.carePlan.tasks.filter(t => t.completed).length;
+      const total = AppState.carePlan.tasks.length;
+      const progress = total > 0 ? (completedCount / total) * 100 : 0;
+      document.getElementById('plan-progress-bar').style.width = `${progress}%`;
+
+      // 更新进度消息
+      document.getElementById('plan-progress-message').textContent =
+        AppState.carePlan.progressMessage || '"搬一块，少一块，慢慢来"';
+    }
+
+    function toggleTaskComplete(index) {
+      if (!AppState.carePlan.tasks[index].completed) {
+        AppState.carePlan.tasks[index].completed = true;
+        renderPlanPage();
+        saveState();
+      }
+    }
+
+    // ====== 从对话生成养护计划 ======
+    function generateCarePlanFromChat() {
+      const btn = document.getElementById('chat-plan-btn');
+      const originalContent = btn.innerHTML;
+      btn.innerHTML = `
+        <span class="material-symbols-outlined text-primary text-base animate-spin">refresh</span>
+        <span class="text-primary font-semibold text-sm">正在生成...</span>
+      `;
+      btn.disabled = true;
+
+      // 发送请求让AI生成养护计划
+      const prompt = '请根据我们之前的对话，为我生成今日的养护计划。';
+
+      fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: AppState.userId, message: prompt })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.carePlan) {
+          AppState.carePlan = data.carePlan;
+          saveState();
+          // 跳转到养护计划页面
+          navigateTo('plan');
+        } else {
+          alert('AI暂未返回养护计划，请继续对话后再试');
+        }
+      })
+      .catch(err => {
+        console.error('生成养护计划失败:', err);
+        alert('生成失败，请稍后再试');
+      })
+      .finally(() => {
+        btn.innerHTML = `
+          <span class="material-symbols-outlined text-primary text-base">auto_awesome</span>
+          <span class="text-primary font-semibold text-sm">生成养护计划</span>
+          <span class="material-symbols-outlined text-primary text-base">arrow_forward</span>
+        `;
+        btn.disabled = false;
+      });
+    }
+
+    // ====== 问候语生成 ======
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      let timeText, greetingText;
+
+      if (hour < 6) {
+        timeText = '深夜时分';
+        greetingText = '夜深了，今天搬走的那些「心石」都值得被记住。';
+      } else if (hour < 12) {
+        timeText = '今日清晨';
+        greetingText = '早安，搬走的那几块「心石」都没有再回来。';
+      } else if (hour < 18) {
+        timeText = '午后时分';
+        greetingText = '午安，今天有没有新的「心石」需要清理？';
+      } else {
+        timeText = '傍晚时分';
+        greetingText = '晚安将至，今天的心石头都搬开了吗？';
+      }
+
+      document.getElementById('greeting-time').textContent = timeText;
+      document.getElementById('greeting-text').textContent = greetingText;
+    }
+
+    // ====== 测评页面 ======
+    function initAssessPage() {
+      AppState.currentQuestionIndex = 0;
+      AppState.assessAnswers = [];
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const idx = AppState.currentQuestionIndex;
+      const question = ASSESS_QUESTIONS[idx];
+
+      document.getElementById('assess-progress').textContent = `${idx + 1} / 10`;
+      document.getElementById('assess-question').textContent = question.q;
+      document.getElementById('assess-progress-bar').style.width = `${(idx + 1) * 10}%`;
+
+      const optsContainer = document.getElementById('assess-options');
+      optsContainer.innerHTML = question.opts.map((opt, i) => `
+        <button onclick="selectAnswer('${['A','B','C'][i]}')" class="w-full py-5 px-6 rounded-xl bg-surfaceContainerLow border border-outlineVariant/30 hover:border-primary hover:bg-surfaceContainerHigh transition-all text-center active:scale-[0.98]">
+          <span class="text-lg text-onSurface font-medium">${opt}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectAnswer(answer) {
+      AppState.assessAnswers.push(answer);
+
+      if (AppState.currentQuestionIndex < 9) {
+        AppState.currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        // 测评完成
+        finishAssessment();
+      }
+    }
+
+    function finishAssessment() {
+      // 调用后端API提交测评
+      fetch(`${API_BASE}/assess`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: AppState.userId, answers: AppState.assessAnswers })
+      })
+      .then(res => res.json())
+      .then(data => {
+        AppState.exhaustType = data.exhaustType;
+
+        // 显示结果页面
+        document.getElementById('result-type').textContent = data.exhaustType;
+        document.getElementById('result-report').innerHTML = marked.parse(data.report);
+
+        // 保存养护计划
+        if (data.carePlan) {
+          AppState.carePlan = data.carePlan;
+          renderCarePlanPreview();
+        }
+
+        navigateTo('assess-result');
+      })
+      .catch(err => {
+        console.error('Assess error:', err);
+        // 降级到本地处理
+        const exhaustType = determineExhaustType(AppState.assessAnswers);
+        AppState.exhaustType = exhaustType;
+        document.getElementById('result-type').textContent = exhaustType;
+        document.getElementById('result-report').innerHTML = marked.parse(generateReport(exhaustType));
+        generateCarePlanPreview(exhaustType);
+        navigateTo('assess-result');
+      });
+    }
+
+    function generateCarePlanPreview(exhaustType) {
+      // 根据内耗类型选择模板
+      const typeToTemplates = {
+        '语言暗示型': ['language_watch', 'night_review'],
+        '社交消耗型': ['prune_relation', 'night_review'],
+        '焦虑纠结型': ['five_reduce', 'morning_breath'],
+        '高压心疲型': ['morning_breath', 'night_review'],
+        '过度欲求型': ['five_reduce', 'night_review'],
+        '认知耗竭型': ['mindful_afternoon', 'night_review']
+      };
+
+      const baseType = exhaustType.split('（')[0];
+      const templates = typeToTemplates[baseType] || ['morning_breath', 'night_review'];
+
+      AppState.carePlan = {
+        tasks: templates.map(t => ({
+          templateId: t,
+          customContent: CARE_TEMPLATES[t].defaults
+        }))
+      };
+
+      renderCarePlanPreview();
+    }
+
+    function renderCarePlanPreview() {
+      const container = document.getElementById('result-care-preview');
+      container.innerHTML = AppState.carePlan.tasks.map(task => renderCareCard(task)).join('');
+
+      // 同时更新首页的养护计划
+      document.getElementById('care-tasks-container').innerHTML = AppState.carePlan.tasks.map(task => renderCareCard(task)).join('');
+    }
+
+    function renderCareCard(task) {
+      const template = CARE_TEMPLATES[task.templateId];
+      const content = task.customContent;
+      const description = template.template.replace(/\{(\w+)\}/g, (_, k) => content[k] || template.defaults[k] || '');
+
+      const colorMap = {
+        tertiary: 'text-tertiary bg-tertiaryContainer/20',
+        primary: 'text-primary bg-primaryContainer/20',
+        secondary: 'text-secondary bg-secondaryContainer/30',
+        neutral: 'text-onSurface bg-onSurface/5'
+      };
+
+      return `
+        <div class="care-card group flex items-center gap-4 p-4 rounded-xl bg-surfaceContainerLow border border-transparent hover:border-surfaceVariant transition-all cursor-pointer">
+          <div class="w-10 h-10 rounded-full ${colorMap[template.colorClass]} flex items-center justify-center">
+            <span class="material-symbols-outlined">${template.icon}</span>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-serif text-base text-onSurface">${template.title}</h5>
+            <p class="text-sm text-onSurfaceVariant">${description}</p>
+          </div>
+          <span class="material-symbols-outlined text-outlineVariant group-hover:text-primary transition-colors">radio_button_unchecked</span>
+        </div>
+      `;
+    }
+
+    // ====== 对话页面 ======
+    function initChatPage() {
+      // 如果有测评结果，更新初始消息
+      if (AppState.exhaustType) {
+        document.getElementById('chat-initial-message').innerHTML = marked.parse(
+          `你好，我是你的**心石清理师**。\n\n我看了你的测评结果，你属于**${AppState.exhaustType}**。\n\n跟我说说今天有什么让你纠结的事，我帮你一块一块搬开。`
+        );
+      }
+    }
+
+    function fillInput(text) {
+      document.getElementById('chat-input').value = text;
+    }
+
+    function handleInputKeypress(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // 添加用户消息
+      addMessage('user', message);
+      input.value = '';
+
+      // 显示加载状态
+      showTypingIndicator();
+
+      // 调用后端API
+      fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: AppState.userId, message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        hideTypingIndicator();
+        // 处理AI响应
+        if (data.message) {
+          addMessage('ai', data.message);
+          if (data.suggestions) {
+            updateSuggestions(data.suggestions);
+          }
+          // 如果有养护计划更新
+          if (data.carePlan) {
+            AppState.carePlan = data.carePlan;
+            renderCarePlanPreview();
+          }
+        } else if (data.error) {
+          addMessage('ai', `抱歉，出了点问题：${data.error}`);
+          updateSuggestions(['再试一次', '换个话题聊聊']);
+        }
+      })
+      .catch(err => {
+        hideTypingIndicator();
+        addMessage('ai', '抱歉，我现在有点累了，稍后再试试？');
+        updateSuggestions(['再试一次', '换个话题聊聊']);
+        console.error('Chat error:', err);
+      });
+    }
+
+    function addMessage(role, content) {
+      const container = document.getElementById('chat-messages');
+
+      if (role === 'user') {
+        container.innerHTML += `
+          <div class="flex items-start gap-3 justify-end">
+            <div class="bg-primary p-4 rounded-xl max-w-[90%]">
+              <p class="text-white">${content}</p>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-surfaceContainerHigh flex items-center justify-center">
+              <span class="material-symbols-outlined text-secondary">person</span>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML += `
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+              <span class="material-symbols-outlined text-white text-lg">psychology</span>
+            </div>
+            <div class="bg-surfaceContainerLow p-4 rounded-xl max-w-[90%] border border-surfaceVariant/30">
+              <div class="markdown-content text-onSurface">${marked.parse(content)}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // 滚动到底部
+      window.scrollTo(0, document.body.scrollHeight);
+
+      // 保存对话
+      AppState.conversations.push({ role, content, time: new Date().toISOString() });
+    }
+
+    function showTypingIndicator() {
+      const container = document.getElementById('chat-messages');
+      container.innerHTML += `
+        <div id="typing-indicator" class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-white text-lg">psychology</span>
+          </div>
+          <div class="bg-surfaceContainerLow p-4 rounded-xl">
+            <div class="typing-indicator"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      `;
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function hideTypingIndicator() {
+      const indicator = document.getElementById('typing-indicator');
+      if (indicator) indicator.remove();
+    }
+
+    function handleAIResponse(userMessage) {
+      // 模拟AI响应（实际项目中调用后端API）
+      let aiMessage, suggestions;
+
+      if (userMessage.includes('纠结') || userMessage.includes('担心')) {
+        aiMessage = `我特别懂这种「一句话卡一天」的感受。\n\n其实你这就是把别人的评价当成了石头，一直放在心里搬不开呀。\n\n> 张海敏博士说：90%的疾病，都是情绪拖出来的。你越把别人的看法当回事，身体越会替你买单。\n\n今天我们只做一件小事就够：试着现在把「那件事」这块石头，从你心里搬出来放在地上。`;
+        suggestions = ['那件事具体是什么？', '我试着搬开它', '聊聊别的事'];
+      } else if (userMessage.includes('测评') || userMessage.includes('结果')) {
+        aiMessage = `你属于**${AppState.exhaustType || '焦虑纠结型'}**。\n\n这种内耗往往来自于大脑不停地在模拟各种「万一」，试图寻找那个最保险的选项，结果反而把自己困在了原地。\n\n现在你可以跟我说说**今天最让你纠结的一件事**吗？`;
+        suggestions = ['说说今天最纠结的事', '我总是担心选错', '我想调整每日计划'];
+      } else {
+        aiMessage = `你说的事我能感受到那份压力。\n\n> 最高级的养生不是往心里加东西，而是把心里的石头一块块搬开。\n\n跟我说说，这件事里最让你纠结的是什么？`;
+        suggestions = ['最纠结的是...', '这件事让我...', '我想聊聊别的'];
+      }
+
+      addMessage('ai', aiMessage);
+      updateSuggestions(suggestions);
+    }
+
+    function updateSuggestions(suggestions) {
+      const container = document.getElementById('chat-suggestions');
+      container.innerHTML = suggestions.map(s => `
+        <button class="suggestion-btn px-4 py-2 rounded-full border border-outlineVariant/50 text-sm text-onSurfaceVariant hover:border-primary" onclick="fillInput('${s}')">
+          ${s}
+        </button>
+      `).join('');
+    }
+
+    // ====== 初始化 ======
+    function init() {
+      updateGreeting();
+
+      // 模拟从localStorage读取状态
+      const savedState = localStorage.getItem('xinshi_state');
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState);
+          AppState.exhaustType = parsed.exhaustType;
+          AppState.conversations = parsed.conversations || [];
+          AppState.carePlan = parsed.carePlan;
+
+          if (AppState.carePlan) {
+            document.getElementById('care-tasks-container').innerHTML =
+              AppState.carePlan.tasks.map(task => renderCareCard(task)).join('');
+          }
+        } catch(e) {}
+      }
+    }
+
+    // 保存状态
+    function saveState() {
+      localStorage.setItem('xinshi_state', JSON.stringify({
+        exhaustType: AppState.exhaustType,
+        conversations: AppState.conversations,
+        carePlan: AppState.carePlan
+      }));
+    }
+
+    // 页面卸载时保存
+    window.addEventListener('beforeunload', saveState);
+
+    // 启动
+    init();
+  </script>
+</body>
+</html>

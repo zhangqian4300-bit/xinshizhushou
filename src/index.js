@@ -398,6 +398,23 @@ export class OpenClawBackend extends EventEmitter {
   }
 
   /**
+   * 注册自定义 GET 路由
+   */
+  get(path, handler) {
+    this.app.get(path, async (req, res) => {
+      try {
+        await handler(req, res, {
+          invoke: (sessionId, message, skill) => this._invoke(sessionId, message, skill)
+        });
+      } catch (e) {
+        this.logger.error(`Custom route ${path} error: ${e.message}`);
+        res.status(500).json({ error: e.message });
+      }
+    });
+    return this;
+  }
+
+  /**
    * 注册中间件
    */
   use(middleware) {
